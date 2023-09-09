@@ -27,4 +27,9 @@ func main() {
 		fmt.Printf("attendance error: %s\n", err)
 	}
 	fmt.Println("success attendance.")
+
+	//if err := akashiLeaving(page); err != nil {
+	//	fmt.Printf("leaving error: %s\n", err)
+	//}
+	//fmt.Println("success leaving.")
 }

@@ -30,6 +30,31 @@ func akashiAttendance(page *agouti.Page) error {
 	return nil
 }
 
+func akashiLeaving(page *agouti.Page) error {
+	// AKASHIログインページ移動
+	if err := openAkashiLoginPage(page); err != nil {
+		return err
+	}
+
+	// AKASHIログイン
+	if err := loginAkashi(page); err != nil {
+		return err
+	}
+
+	// 音声ミュート
+	if err := muteAkashi(page); err != nil {
+		return err
+	}
+
+	// 退勤
+	attendanceButton := page.FindByXPath("/html/body/div[1]/div/section/form/div[2]/div/div[2]/ul[1]/li[1]/a[@data-punch-type='leaving']")
+	if err := attendanceButton.Click(); err != nil {
+		return fmt.Errorf("Failed to click leaving button. %s\n", err)
+	}
+
+	return nil
+}
+
 func openAkashiLoginPage(page *agouti.Page) error {
 	// 次に勤怠ページを指定したAKASHIのページを開きます。
 	if err := page.Navigate("https://atnd.ak4.jp/login?next=%2Fmypage%2Fpunch"); err != nil {
