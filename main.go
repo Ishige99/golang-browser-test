@@ -3,9 +3,17 @@ package main
 import (
 	"fmt"
 	"github.com/sclevine/agouti"
+	"log"
 )
 
 func main() {
+	// オプションの選択
+	option, err := selectOption()
+	if err != nil {
+		fmt.Printf("select option error: %s\n", err)
+		return
+	}
+
 	// chromeドライバを使って、Google Chromeを使用できるようにする。
 	agoutiDriver := agouti.ChromeDriver()
 	if err := agoutiDriver.Start(); err != nil {
@@ -21,26 +29,10 @@ func main() {
 		return
 	}
 
-	// オプションの選択
-	akashiOption, err := selectOption()
-	if err != nil {
-		fmt.Printf("select option error: %s\n", err)
+	// オプションに応じて勤怠処理の実行
+	if err := executeAkashiTimeClock(page, option); err != nil {
+		log.Fatalln(err)
 	}
 
-	var successMessage string
-
-	switch akashiOption {
-	case attendanceOptionNumber:
-		if err := akashiAttendance(page); err != nil {
-			fmt.Printf("attendance error: %s\n", err)
-		}
-		successMessage = "success attendance."
-	case leavingOptionNumber:
-		if err := akashiLeaving(page); err != nil {
-			fmt.Printf("leaving error: %s\n", err)
-		}
-		successMessage = "success leaving."
-	}
-
-	fmt.Println(successMessage)
+	fmt.Println("success")
 }

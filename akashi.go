@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/sclevine/agouti"
+	"os"
 )
 
 const (
@@ -33,7 +35,7 @@ func selectOption() (int, error) {
 	return option, nil
 }
 
-func akashiAttendance(page *agouti.Page) error {
+func executeAkashiTimeClock(page *agouti.Page, option int) error {
 	// AKASHIログインページ移動
 	if err := openAkashiLoginPage(page); err != nil {
 		return err
@@ -49,35 +51,18 @@ func akashiAttendance(page *agouti.Page) error {
 		return err
 	}
 
-	// 出勤
-	attendanceButton := page.FindByXPath("/html/body/div[1]/div/section/form/div[2]/div/div[2]/ul[1]/li[1]/a[@data-punch-type='attendance']")
-	if err := attendanceButton.Click(); err != nil {
-		return fmt.Errorf("Failed to click attendance button. %s\n", err)
+	// オプションに応じて勤怠処理の変更
+	var xPath string
+	switch option {
+	case attendanceOptionNumber:
+		xPath = "/html/body/div[1]/div/section/form/div[2]/div/div[2]/ul[1]/li[1]/a[@data-punch-type='attendance']"
+	case leavingOptionNumber:
+		xPath = "/html/body/div[1]/div/section/form/div[2]/div/div[2]/ul[1]/li[2]/a[@data-punch-type='leaving']"
 	}
 
-	return nil
-}
-
-func akashiLeaving(page *agouti.Page) error {
-	// AKASHIログインページ移動
-	if err := openAkashiLoginPage(page); err != nil {
-		return err
-	}
-
-	// AKASHIログイン
-	if err := loginAkashi(page); err != nil {
-		return err
-	}
-
-	// 音声ミュート
-	if err := muteAkashi(page); err != nil {
-		return err
-	}
-
-	// 退勤
-	attendanceButton := page.FindByXPath("/html/body/div[1]/div/section/form/div[2]/div/div[2]/ul[1]/li[1]/a[@data-punch-type='leaving']")
-	if err := attendanceButton.Click(); err != nil {
-		return fmt.Errorf("Failed to click leaving button. %s\n", err)
+	button := page.FindByXPath(xPath)
+	if err := button.Click(); err != nil {
+		return fmt.Errorf("Failed to click button. %s\n", err)
 	}
 
 	return nil
@@ -92,14 +77,24 @@ func openAkashiLoginPage(page *agouti.Page) error {
 }
 
 func loginAkashi(page *agouti.Page) error {
-	// AKASHIログインフォームにそれぞれログイン内容を入力。
+	// フォーム情報を取得
 	formCompanyId := page.FindByID("form_company_id")
 	formLoginId := page.FindByID("form_login_id")
 	formPassword := page.FindByID("form_password")
 
-	formCompanyId.Fill("company")
-	formLoginId.Fill("login_id")
-	formPassword.Fill("password")
+	// 環境変数セット
+	if err := godotenv.Load(); err != nil {
+		return fmt.Errorf("Failed loading .env file: %s\n", err)
+	}
+
+	companyId := os.Getenv("FORM_COMPANY_ID")
+	loginId := os.Getenv("FORM_LOGIN_ID")
+	password := os.Getenv("FORM_PASSWORD")
+
+	// フォームにログイン情報を入力
+	formCompanyId.Fill(companyId)
+	formLoginId.Fill(loginId)
+	formPassword.Fill(password)
 
 	// submit
 	formSubmitButton := page.FindByID("submit-button")
