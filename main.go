@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/sclevine/agouti"
-	"time"
 )
 
 func main() {
@@ -39,15 +38,25 @@ func main() {
 	formLoginId.Fill("login_id")
 	formPassword.Fill("password")
 
-	// todo: 後で消す（テスト用スリープ、入力内容確認）
-	time.Sleep(2 * time.Second)
-
 	formSubmitButton := page.FindByID("submit-button")
 	if err := formSubmitButton.Click(); err != nil {
-		fmt.Printf("Failed to navigate to form button click. %s\n", err)
+		fmt.Printf("Failed to click form button. %s\n", err)
 		return
 	}
 
-	// todo: 後で消す（テスト用スリープ、入力内容確認）
-	time.Sleep(2 * time.Second)
+	// 音声ミュート
+	muteButton := page.FindByXPath("/html/body/div[1]/div/section/form/div[1]/div[2]/ul/li[2]")
+	if err := muteButton.Click(); err != nil {
+		fmt.Printf("Failed to click mute button. %s\n", err)
+		return
+	}
+
+	// 出勤
+	attendanceButton := page.FindByXPath("/html/body/div[1]/div/section/form/div[2]/div/div[2]/ul[1]/li[1]/a[@data-punch-type='attendance']")
+	if err := attendanceButton.Click(); err != nil {
+		fmt.Printf("Failed to click attendance button. %s\n", err)
+		return
+	}
+
+	fmt.Println("success attendance.")
 }
