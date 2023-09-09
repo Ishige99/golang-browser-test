@@ -5,6 +5,34 @@ import (
 	"github.com/sclevine/agouti"
 )
 
+const (
+	attendanceOptionNumber = 1
+	leavingOptionNumber    = 2
+)
+
+func selectOption() (int, error) {
+	var optionMap = map[int]string{
+		attendanceOptionNumber: "出勤",
+		leavingOptionNumber:    "退勤",
+	}
+
+	// 実行したいオプションを入力してもらう
+	var option int
+	fmt.Printf("select options \n")
+	for k, v := range optionMap {
+		fmt.Printf("%v: %v\n", k, v)
+	}
+	fmt.Printf(">")
+	fmt.Scan(&option)
+
+	// 入力されたオプションが正しいか判定
+	if _, ok := optionMap[option]; !ok {
+		return 0, fmt.Errorf("not the correct option value")
+	}
+
+	return option, nil
+}
+
 func akashiAttendance(page *agouti.Page) error {
 	// AKASHIログインページ移動
 	if err := openAkashiLoginPage(page); err != nil {

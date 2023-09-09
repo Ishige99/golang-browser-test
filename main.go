@@ -21,15 +21,26 @@ func main() {
 		return
 	}
 
-	// todo: コマンドラインから出勤と退勤を選択する
-
-	if err := akashiAttendance(page); err != nil {
-		fmt.Printf("attendance error: %s\n", err)
+	// オプションの選択
+	akashiOption, err := selectOption()
+	if err != nil {
+		fmt.Printf("select option error: %s\n", err)
 	}
-	fmt.Println("success attendance.")
 
-	//if err := akashiLeaving(page); err != nil {
-	//	fmt.Printf("leaving error: %s\n", err)
-	//}
-	//fmt.Println("success leaving.")
+	var successMessage string
+
+	switch akashiOption {
+	case attendanceOptionNumber:
+		if err := akashiAttendance(page); err != nil {
+			fmt.Printf("attendance error: %s\n", err)
+		}
+		successMessage = "success attendance."
+	case leavingOptionNumber:
+		if err := akashiLeaving(page); err != nil {
+			fmt.Printf("leaving error: %s\n", err)
+		}
+		successMessage = "success leaving."
+	}
+
+	fmt.Println(successMessage)
 }
